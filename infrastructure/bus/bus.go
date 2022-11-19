@@ -20,6 +20,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	bus.Post("/", c.create)
 	bus.Post("/login", c.login)
 	bus.Delete("/:id", c.delete)
+	bus.Put("/:id", c.edit)
 }
 
 // All godoc
@@ -103,6 +104,43 @@ func (c *Controller) delete(ctx *fiber.Ctx) error {
 	}
 
 	return common.DoCommonSuccessResponse(ctx, nil)
+}
+
+// All godoc
+// @Tags Bus
+// @Summary Edit Bus
+// @Description Put all mandatory parameter
+// @Param id path string true "Bus ID"
+// @Param auth header string true "token"
+// @Param EditBusDto body dto.EditBusDto true "EditBusDto"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.EditBusResponse
+// @Failure 200 {object} dto.EditBusResponse
+// @Router /bus/{id} [put]
+func (c *Controller) edit(ctx *fiber.Ctx) error {
+	var (
+		body     dto.EditBusDto
+		response dto.EditBusResponse
+	)
+
+	err := common.DoCommonRequest(ctx, &body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	id := ctx.Params("id")
+
+	auth := ctx.Get("auth")
+
+	c.Shared.Logger.Infof("edit driver, data: %s, id: %s, token: %s", body, id, auth)
+
+	response, err = c.Interfaces.BusViewService.EditBus(body, id, auth)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
 }
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {

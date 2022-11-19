@@ -63,6 +63,25 @@ type (
 		IsActive bool      `json:"isActive"`
 		Token    string    `json:"token"`
 	}
+
+	// EditBusDto EditBusDto
+	EditBusDto struct {
+		Number   int       `json:"number" validate:"omitempty"`
+		Plate    string    `json:"plate" validate:"omitempty"`
+		Status   BusStatus `json:"status" validate:"omitempty,oneof=EMPTY MODERATE FULL"`
+		Route    Route     `json:"route" validate:"omitempty,oneof=RED BLUE"`
+		IsActive bool      `json:"isActive" validate:"omitempty"`
+	}
+
+	// EditBusResponse EditBusResponse
+	EditBusResponse struct {
+		ID       uint      `json:"id"`
+		Number   int       `json:"number"`
+		Plate    string    `json:"plate"`
+		Status   BusStatus `json:"status"`
+		Route    Route     `json:"route"`
+		IsActive bool      `json:"isActive"`
+	}
 )
 
 func (b *Bus) ToCreateBusResponse() CreateBusResponse {
@@ -86,5 +105,38 @@ func (b *Bus) ToDriverLoginResponse(token string) DriverLoginResponse {
 		Route:    b.Route,
 		IsActive: b.IsActive,
 		Token:    token,
+	}
+}
+
+func (b *Bus) FillBusEdit(data EditBusDto) {
+	if data.Number != 0 {
+		b.Number = data.Number
+	}
+
+	if data.Plate != "" {
+		b.Plate = data.Plate
+	}
+
+	if data.Status != "" {
+		b.Status = data.Status
+	}
+
+	if data.Route != "" {
+		b.Route = data.Route
+	}
+
+	if b.IsActive != data.IsActive {
+		b.IsActive = data.IsActive
+	}
+}
+
+func (b *Bus) ToEditBusResponnse() EditBusResponse {
+	return EditBusResponse{
+		ID: b.ID,
+		Number: b.Number,
+		Plate: b.Plate,
+		Status: b.Status,
+		Route: b.Route,
+		IsActive: b.IsActive,
 	}
 }

@@ -85,6 +85,52 @@ const docTemplate = `{
             }
         },
         "/bus/{id}": {
+            "put": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bus"
+                ],
+                "summary": "Edit Bus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bus ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "auth",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "EditBusDto",
+                        "name": "EditBusDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EditBusDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EditBusResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Put all mandatory parameter",
                 "consumes": [
@@ -231,6 +277,58 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.EditBusDto": {
+            "type": "object",
+            "properties": {
+                "isActive": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string",
+                    "enum": [
+                        "RED",
+                        "BLUE"
+                    ]
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "EMPTY",
+                        "MODERATE",
+                        "FULL"
+                    ]
+                }
+            }
+        },
+        "dto.EditBusResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

@@ -14,6 +14,7 @@ type (
 		CreateBusEntry(data dto.CreateBusDto) (dto.CreateBusResponse, error)
 		LoginDriver(data dto.DriverLoginDto) (dto.DriverLoginResponse, error)
 		DeleteBus(id string) error
+		EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error)
 	}
 	viewService struct {
 		application application.Holder
@@ -94,6 +95,39 @@ func (v *viewService) DeleteBus(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (v *viewService) EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error) {
+	var (
+		bus = &dto.Bus{}
+		response dto.EditBusResponse
+	)
+
+	username := common.ExtractTokenData(token, v.shared.Env)
+	err := v.application.BusService.FindByUsername(username, bus)
+	if err != nil {
+		v.shared.Logger.Errorf("error when checking username, err: %s", err.Error())
+		return response, err
+	}
+	
+
+	err = v.application.BusService.FindById(id, bus)
+	if err != nil {
+		v.shared.Logger.Errorf("error when finding bus, err: %s", err.Error())
+		return response, err
+	}
+
+	bus.FillBusEdit(data)
+
+	err = v.application.BusService.Save(bus)
+	if err != nil {
+		v.shared.Logger.Errorf("error when saving update, err: %s", err.Error())
+		return response, err
+	}
+
+	response = bus.ToEditBusResponnse()
+
+	return response, nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

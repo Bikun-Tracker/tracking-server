@@ -66,6 +66,41 @@ definitions:
       token:
         type: string
     type: object
+  dto.EditBusDto:
+    properties:
+      isActive:
+        type: boolean
+      number:
+        type: integer
+      plate:
+        type: string
+      route:
+        enum:
+        - RED
+        - BLUE
+        type: string
+      status:
+        enum:
+        - EMPTY
+        - MODERATE
+        - FULL
+        type: string
+    type: object
+  dto.EditBusResponse:
+    properties:
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      number:
+        type: integer
+      plate:
+        type: string
+      route:
+        type: string
+      status:
+        type: string
+    type: object
   dto.Status:
     properties:
       data: {}
@@ -118,6 +153,37 @@ paths:
       - application/json
       responses: {}
       summary: Delete bus
+      tags:
+      - Bus
+    put:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: Bus ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: auth
+        required: true
+        type: string
+      - description: EditBusDto
+        in: body
+        name: EditBusDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditBusDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EditBusResponse'
+      summary: Edit Bus
       tags:
       - Bus
   /bus/login:

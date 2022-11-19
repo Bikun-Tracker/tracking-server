@@ -16,6 +16,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/bus/": {
+            "post": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bus"
+                ],
+                "summary": "Create new bus entry",
+                "parameters": [
+                    {
+                        "description": "CreateBus",
+                        "name": "CreateBusDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBusDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBusResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "Put all mandatory parameter",
@@ -26,9 +60,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "healthcheck"
+                    "Healthcheck"
                 ],
-                "summary": "Featured Accommodations Card",
+                "summary": "Check system status",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -44,6 +78,63 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CreateBusDto": {
+            "type": "object",
+            "required": [
+                "number",
+                "password",
+                "plate",
+                "route",
+                "username"
+            ],
+            "properties": {
+                "number": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string",
+                    "enum": [
+                        "RED",
+                        "BLUE"
+                    ]
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateBusResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "plate": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Status": {
             "type": "object",
             "properties": {
@@ -65,8 +156,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Fiber Example API",
-	Description:      "This is a sample swagger for Fiber",
+	Title:            "Bikun Tracking API",
+	Description:      "API definition for bikun tracking specification",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

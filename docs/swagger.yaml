@@ -1,5 +1,44 @@
 basePath: /
 definitions:
+  dto.CreateBusDto:
+    properties:
+      number:
+        type: integer
+      password:
+        type: string
+      plate:
+        type: string
+      route:
+        enum:
+        - RED
+        - BLUE
+        type: string
+      username:
+        type: string
+    required:
+    - number
+    - password
+    - plate
+    - route
+    - username
+    type: object
+  dto.CreateBusResponse:
+    properties:
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      number:
+        type: integer
+      plate:
+        type: string
+      route:
+        type: string
+      status:
+        type: string
+      username:
+        type: string
+    type: object
   dto.Status:
     properties:
       data: {}
@@ -11,10 +50,32 @@ definitions:
 host: localhost:8000
 info:
   contact: {}
-  description: This is a sample swagger for Fiber
-  title: Fiber Example API
+  description: API definition for bikun tracking specification
+  title: Bikun Tracking API
   version: "1.0"
 paths:
+  /bus/:
+    post:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: CreateBus
+        in: body
+        name: CreateBusDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateBusDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateBusResponse'
+      summary: Create new bus entry
+      tags:
+      - Bus
   /healthcheck:
     get:
       consumes:
@@ -29,7 +90,7 @@ paths:
             items:
               $ref: '#/definitions/dto.Status'
             type: array
-      summary: Featured Accommodations Card
+      summary: Check system status
       tags:
-      - healthcheck
+      - Healthcheck
 swagger: "2.0"

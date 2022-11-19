@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"tracking-server/shared/config"
+	"tracking-server/shared/dto"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -30,7 +31,21 @@ func NewDatabase(env *config.EnvConfig, log *logrus.Logger) *gorm.DB {
 
 	log.Printf("connected to databse with configuration: %s", dsn)
 
+	migrateSchema(db, log)
+
 	return db
+}
+
+func migrateSchema(db *gorm.DB, log *logrus.Logger) {
+	err := db.AutoMigrate(
+		&dto.Bus{},
+	)
+
+	if err != nil {
+		log.Errorf("error migrateing schema, err: %s", err.Error())
+	}
+
+	log.Infoln("database migrated")
 }
 
 func setConnectionConfiguration(db *gorm.DB) {

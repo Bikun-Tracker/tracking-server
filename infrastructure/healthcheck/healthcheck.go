@@ -17,8 +17,8 @@ func (c *Controller) Routes(app *fiber.App) {
 }
 
 // All godoc
-// @Tags healthcheck
-// @Summary Featured Accommodations Card
+// @Tags Healthcheck
+// @Summary Check system status
 // @Description Put all mandatory parameter
 // @Accept  json
 // @Produce  json

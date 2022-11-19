@@ -7,9 +7,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/sirupsen/logrus"
 )
 
-func NewHttp() *fiber.App {
+func NewHttp(log *logrus.Logger) *fiber.App {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
@@ -24,6 +25,8 @@ func NewHttp() *fiber.App {
 	app.Use(cors.New(cors.ConfigDefault))
 
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "Bikun Tracking Metrics"}))
+
+	log.Infoln("fiber http receiver initialized")
 
 	return app
 }

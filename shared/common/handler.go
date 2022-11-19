@@ -7,12 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
 type (
 	Response struct {
-		Status string `json:"status"`
-		Error string `json:"error"`
-		Data interface{} `json:"data"`
+		Status string      `json:"status"`
+		Error  string      `json:"error"`
+		Data   interface{} `json:"data"`
 	}
 )
 
@@ -34,13 +33,13 @@ func DoCommonRequest(ctx *fiber.Ctx, body interface{}) error {
 func DoCommonSuccessResponse(ctx *fiber.Ctx, data interface{}) error {
 	return ctx.Status(fiber.StatusOK).JSON(Response{
 		Status: "OK",
-		Data: data,
+		Data:   data,
 	})
 }
 
 func DoCommonErrorResponse(ctx *fiber.Ctx, err error) error {
 	return ctx.Status(fiber.StatusOK).JSON(Response{
 		Status: "FAILED",
-		Error: err.Error(),
+		Error:  err.Error(),
 	})
 }

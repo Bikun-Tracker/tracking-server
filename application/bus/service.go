@@ -8,6 +8,7 @@ import (
 type (
 	Service interface {
 		Create(data *dto.Bus) error
+		FindByUsername(username string, bus *dto.Bus) error
 	}
 	service struct {
 		shared shared.Holder
@@ -16,6 +17,11 @@ type (
 
 func (s *service) Create(data *dto.Bus) error {
 	err := s.shared.DB.Create(data).Error
+	return err
+}
+
+func (s *service) FindByUsername(username string, bus *dto.Bus) error {
+	err := s.shared.DB.Where("username = ?", username).First(bus).Error
 	return err
 }
 

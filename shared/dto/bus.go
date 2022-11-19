@@ -23,7 +23,7 @@ type (
 		Status   BusStatus `gorm:"column:status;default:EMPTY"`
 		Route    Route     `gorm:"column:route"`
 		IsActive bool      `gorm:"column:is_active;default:false"`
-		Username string    `gorm:"column:username"`
+		Username string    `gorm:"column:username;unique"`
 		Password string    `gorm:"password"`
 	}
 
@@ -46,16 +46,45 @@ type (
 		IsActive bool      `json:"isActive"`
 		Username string    `json:"username"`
 	}
+
+	// DriverLoginDto DriverLoginDto
+	DriverLoginDto struct {
+		Username string `json:"username" validate:"required"`
+		Password string `json:"password" validate:"required"`
+	}
+
+	// DriverLoginResponse DriverLoginResponse
+	DriverLoginResponse struct {
+		ID       uint      `json:"id"`
+		Number   int       `json:"number"`
+		Plate    string    `json:"plate"`
+		Status   BusStatus `json:"status"`
+		Route    Route     `json:"route"`
+		IsActive bool      `json:"isActive"`
+		Token    string    `json:"token"`
+	}
 )
 
 func (b *Bus) ToCreateBusResponse() CreateBusResponse {
 	return CreateBusResponse{
-		ID: b.ID,
-		Number: b.Number,
-		Plate: b.Plate,
-		Status: b.Status,
-		Route: b.Route,
+		ID:       b.ID,
+		Number:   b.Number,
+		Plate:    b.Plate,
+		Status:   b.Status,
+		Route:    b.Route,
 		IsActive: b.IsActive,
 		Username: b.Username,
+	}
+}
+
+func (b *Bus) ToDriverLoginResponse(token string) DriverLoginResponse {
+	return DriverLoginResponse{
+		ID:       b.ID,
+		Number:   b.Number,
+		Plate:    b.Plate,
+		Status:   b.Status,
+		Route:    b.Route,
+		IsActive: b.IsActive,
+		Token:    token,
 	}
 }

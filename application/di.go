@@ -11,7 +11,7 @@ import (
 type Holder struct {
 	dig.In
 	HealthcheckService healthcheck.Service
-	BusService bus.Service
+	BusService         bus.Service
 }
 
 func Register(container *dig.Container) error {

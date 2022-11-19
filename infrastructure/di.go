@@ -12,7 +12,7 @@ import (
 type Holder struct {
 	dig.In
 	Healthcheck healthcheck.Controller
-	Bus bus.Controller
+	Bus         bus.Controller
 }
 
 func Register(container *dig.Container) error {

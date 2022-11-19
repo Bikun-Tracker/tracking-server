@@ -13,6 +13,7 @@ type (
 	ViewService interface {
 		CreateBusEntry(data dto.CreateBusDto) (dto.CreateBusResponse, error)
 		LoginDriver(data dto.DriverLoginDto) (dto.DriverLoginResponse, error)
+		DeleteBus(id string) error
 	}
 	viewService struct {
 		application application.Holder
@@ -84,6 +85,15 @@ func (v *viewService) LoginDriver(data dto.DriverLoginDto) (dto.DriverLoginRespo
 	response = bus.ToDriverLoginResponse(token)
 
 	return response, nil
+}
+
+func (v *viewService) DeleteBus(id string) error {
+	err := v.application.BusService.Delete(id)
+	if err != nil {
+		v.shared.Logger.Errorf("error when deleteing bus, err: %s", err.Error())
+		return err
+	}
+	return nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

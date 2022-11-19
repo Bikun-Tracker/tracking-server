@@ -103,6 +103,23 @@ paths:
       summary: Create new bus entry
       tags:
       - Bus
+  /bus/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: Bus ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete bus
+      tags:
+      - Bus
   /bus/login:
     post:
       consumes:

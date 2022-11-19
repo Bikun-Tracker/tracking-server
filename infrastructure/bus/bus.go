@@ -19,6 +19,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	bus := app.Group("/bus")
 	bus.Post("/", c.create)
 	bus.Post("/login", c.login)
+	bus.Delete("/:id", c.delete)
 }
 
 // All godoc
@@ -39,7 +40,7 @@ func (c *Controller) create(ctx *fiber.Ctx) error {
 
 	err := common.DoCommonRequest(ctx, &body)
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(err.Error())
+		return common.DoCommonErrorResponse(ctx, err)
 	}
 
 	c.Shared.Logger.Infof("create bus, data: %s", body)
@@ -70,7 +71,7 @@ func (c *Controller) login(ctx *fiber.Ctx) error {
 
 	err := common.DoCommonRequest(ctx, &body)
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(err.Error())
+		return common.DoCommonErrorResponse(ctx, err)
 	}
 
 	c.Shared.Logger.Infof("login driver, data: %s", body)
@@ -81,6 +82,27 @@ func (c *Controller) login(ctx *fiber.Ctx) error {
 	}
 
 	return common.DoCommonSuccessResponse(ctx, response)
+}
+
+// All godoc
+// @Tags Bus
+// @Summary Delete bus
+// @Description Put all mandatory parameter
+// @Param id path string true "Bus ID"
+// @Accept  json
+// @Produce  json
+// @Router /bus/{id} [delete]
+func (c *Controller) delete(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	c.Shared.Logger.Infof("delete bus, data: %s", id)
+
+	err := c.Interfaces.BusViewService.DeleteBus(id)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, nil)
 }
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {

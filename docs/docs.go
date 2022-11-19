@@ -84,6 +84,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/bus/{id}": {
+            "delete": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bus"
+                ],
+                "summary": "Delete bus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bus ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "Put all mandatory parameter",

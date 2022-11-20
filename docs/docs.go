@@ -180,6 +180,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/news/": {
+            "post": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "Create new news",
+                "parameters": [
+                    {
+                        "description": "CreateNews",
+                        "name": "CreateNewsDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateNewsDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBusResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -236,6 +270,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateNewsDto": {
+            "type": "object",
+            "required": [
+                "detail",
+                "title"
+            ],
+            "properties": {
+                "detail": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateNewsResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }

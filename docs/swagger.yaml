@@ -39,6 +39,27 @@ definitions:
       username:
         type: string
     type: object
+  dto.CreateNewsDto:
+    properties:
+      detail:
+        type: string
+      title:
+        type: string
+    required:
+    - detail
+    - title
+    type: object
+  dto.CreateNewsResponse:
+    properties:
+      createdAt:
+        type: string
+      detail:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   dto.DriverLoginDto:
     properties:
       password:
@@ -225,4 +246,26 @@ paths:
       summary: Check system status
       tags:
       - Healthcheck
+  /news/:
+    post:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: CreateNews
+        in: body
+        name: CreateNewsDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateNewsDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateBusResponse'
+      summary: Create new news
+      tags:
+      - News
 swagger: "2.0"

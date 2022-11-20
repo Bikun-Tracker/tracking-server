@@ -8,6 +8,7 @@ import (
 type (
 	Service interface {
 		Create(data *dto.News) error
+		GetAll(data *dto.NewsSlice) error
 	}
 	service struct {
 		shared shared.Holder
@@ -16,6 +17,11 @@ type (
 
 func (s *service) Create(data *dto.News) error {
 	err := s.shared.DB.Create(data).Error
+	return err
+}
+
+func (s *service) GetAll(data *dto.NewsSlice) error {
+	err := s.shared.DB.Find(data).Error
 	return err
 }
 

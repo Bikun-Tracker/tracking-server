@@ -122,6 +122,24 @@ definitions:
       status:
         type: string
     type: object
+  dto.GetAllNewsResponse:
+    properties:
+      news:
+        items:
+          $ref: '#/definitions/dto.News'
+        type: array
+    type: object
+  dto.News:
+    properties:
+      createdAt:
+        type: string
+      detail:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   dto.Status:
     properties:
       data: {}
@@ -247,6 +265,20 @@ paths:
       tags:
       - Healthcheck
   /news/:
+    get:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetAllNewsResponse'
+      summary: Get all news
+      tags:
+      - News
     post:
       consumes:
       - application/json

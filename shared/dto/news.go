@@ -4,11 +4,13 @@ import "time"
 
 type (
 	News struct {
-		ID        uint      `gorm:"primaryKey;autoIncrement"`
-		Title     string    `gorm:"column:title"`
-		Detail    string    `gorm:"column:detail"`
-		CreatedAt time.Time `gorm:"column:createdAt"`
+		ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+		Title     string    `gorm:"column:title" json:"title"`
+		Detail    string    `gorm:"column:detail" json:"detail"`
+		CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
 	}
+
+	NewsSlice []News
 
 	// CreateNewsDto CreateNewsDto
 	CreateNewsDto struct {
@@ -23,6 +25,11 @@ type (
 		Detail    string `json:"detail"`
 		CreatedAt string `json:"createdAt"`
 	}
+
+	// GetAllNewsResponse GetAllNewsResponse
+	GetAllNewsResponse struct {
+		News []News `json:"news"`
+	}
 )
 
 func (n *News) ToCreateNewsResponse() CreateNewsResponse {
@@ -31,5 +38,11 @@ func (n *News) ToCreateNewsResponse() CreateNewsResponse {
 		Title:     n.Title,
 		Detail:    n.Detail,
 		CreatedAt: n.CreatedAt.String(),
+	}
+}
+
+func (n *NewsSlice) ToGetAllNewsResponse() GetAllNewsResponse {
+	return GetAllNewsResponse{
+		News: *n,
 	}
 }

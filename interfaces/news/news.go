@@ -10,6 +10,7 @@ import (
 type (
 	ViewService interface {
 		CreateNews(data dto.CreateNewsDto) (dto.CreateNewsResponse, error)
+		GetAllNews() (dto.GetAllNewsResponse, error)
 	}
 	viewService struct {
 		application application.Holder
@@ -36,6 +37,23 @@ func (v *viewService) CreateNews(data dto.CreateNewsDto) (dto.CreateNewsResponse
 	}
 
 	response = news.ToCreateNewsResponse()
+
+	return response, nil
+}
+
+func (v *viewService) GetAllNews() (dto.GetAllNewsResponse, error) {
+	var (
+		news     = &dto.NewsSlice{}
+		response dto.GetAllNewsResponse
+	)
+
+	err := v.application.NewsService.GetAll(news)
+	if err != nil {
+		v.shared.Logger.Errorf("error when getting all news, err: %s", err.Error())
+		return response, err
+	}
+
+	response = news.ToGetAllNewsResponse()
 
 	return response, nil
 }

@@ -17,6 +17,7 @@ type Controller struct {
 func (c *Controller) Routes(app *fiber.App) {
 	news := app.Group("/news")
 	news.Post("/", c.create)
+	news.Get("/", c.getAll)
 }
 
 // All godoc
@@ -40,9 +41,31 @@ func (c *Controller) create(ctx *fiber.Ctx) error {
 		return common.DoCommonErrorResponse(ctx, err)
 	}
 
-	c.Shared.Logger.Infof("create bus, data: %s", body)
+	c.Shared.Logger.Infof("create news, data: %s", body)
 
 	response, err = c.Interfaces.NewsViewService.CreateNews(body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
+}
+
+// All godoc
+// @Tags News
+// @Summary Get all news
+// @Description Put all mandatory parameter
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.GetAllNewsResponse
+// @Failure 200 {object} dto.GetAllNewsResponse
+// @Router /news/ [get]
+func (c *Controller) getAll(ctx *fiber.Ctx) error {
+	var (
+		response dto.GetAllNewsResponse
+	)
+
+	response, err := c.Interfaces.NewsViewService.GetAllNews()
 	if err != nil {
 		return common.DoCommonErrorResponse(ctx, err)
 	}

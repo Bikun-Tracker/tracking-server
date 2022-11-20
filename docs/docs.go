@@ -182,6 +182,27 @@ const docTemplate = `{
             }
         },
         "/news/": {
+            "get": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "Get all news",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllNewsResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Put all mandatory parameter",
                 "consumes": [
@@ -395,6 +416,34 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GetAllNewsResponse": {
+            "type": "object",
+            "properties": {
+                "news": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.News"
+                    }
+                }
+            }
+        },
+        "dto.News": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }

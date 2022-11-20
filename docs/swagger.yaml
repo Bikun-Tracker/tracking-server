@@ -122,6 +122,13 @@ definitions:
       status:
         type: string
     type: object
+  dto.EditNewsDto:
+    properties:
+      detail:
+        type: string
+      title:
+        type: string
+    type: object
   dto.GetAllNewsResponse:
     properties:
       news:
@@ -335,6 +342,32 @@ paths:
           schema:
             $ref: '#/definitions/dto.News'
       summary: Get news detail
+      tags:
+      - News
+    put:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: News ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: EditNewsDto
+        in: body
+        name: EditNewsDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditNewsDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.News'
+      summary: Edit news
       tags:
       - News
 swagger: "2.0"

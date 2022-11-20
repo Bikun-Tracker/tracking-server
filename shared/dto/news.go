@@ -30,6 +30,12 @@ type (
 	GetAllNewsResponse struct {
 		News []News `json:"news"`
 	}
+
+	// EditNewsDto EditNewsDto
+	EditNewsDto struct {
+		Title  string `json:"title" validate:"omitempty"`
+		Detail string `json:"detail" validate:"omitempty"`
+	}
 )
 
 func (n *News) ToCreateNewsResponse() CreateNewsResponse {
@@ -44,5 +50,15 @@ func (n *News) ToCreateNewsResponse() CreateNewsResponse {
 func (n *NewsSlice) ToGetAllNewsResponse() GetAllNewsResponse {
 	return GetAllNewsResponse{
 		News: *n,
+	}
+}
+
+func (n *News) FillNewsEdit(data EditNewsDto) {
+	if data.Title != "" {
+		n.Title = data.Title
+	}
+
+	if data.Detail != "" {
+		n.Detail = data.Detail
 	}
 }

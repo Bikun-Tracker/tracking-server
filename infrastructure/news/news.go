@@ -20,6 +20,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	news.Get("/", c.getAll)
 	news.Get("/:id", c.get)
 	news.Delete("/:id", c.delete)
+	news.Put("/:id", c.edit)
 }
 
 // All godoc
@@ -119,7 +120,38 @@ func (c *Controller) delete(ctx *fiber.Ctx) error {
 	return common.DoCommonSuccessResponse(ctx, nil)
 }
 
-// TODO: Update
+// All godoc
+// @Tags News
+// @Summary Edit news
+// @Description Put all mandatory parameter
+// @Param id path string true "News ID"
+// @Param EditNewsDto body dto.EditNewsDto true "EditNewsDto"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.News
+// @Failure 200 {object} dto.News
+// @Router /news/{id} [put]
+func (c *Controller) edit(ctx *fiber.Ctx) error {
+	var (
+		body dto.EditNewsDto
+	)
+
+	err := common.DoCommonRequest(ctx, &body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	id := ctx.Params("id")
+
+	c.Shared.Logger.Infof("edit news, data: %s, id: %s", body, id)
+
+	response, err := c.Interfaces.NewsViewService.EditNews(body, id)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
+}
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {
 	return Controller{

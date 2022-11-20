@@ -11,6 +11,7 @@ type (
 	ViewService interface {
 		CreateNews(data dto.CreateNewsDto) (dto.CreateNewsResponse, error)
 		GetAllNews() (dto.GetAllNewsResponse, error)
+		GetNewsDetail(id string) (dto.News, error)
 	}
 	viewService struct {
 		application application.Holder
@@ -56,6 +57,20 @@ func (v *viewService) GetAllNews() (dto.GetAllNewsResponse, error) {
 	response = news.ToGetAllNewsResponse()
 
 	return response, nil
+}
+
+func (v *viewService) GetNewsDetail(id string) (dto.News, error) {
+	var (
+		news = &dto.News{}
+	)
+
+	err := v.application.NewsService.GetById(id, news)
+	if err != nil {
+		v.shared.Logger.Errorf("error when getting news by id, err: %s", err.Error())
+		return *news, err
+	}
+
+	return *news, nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

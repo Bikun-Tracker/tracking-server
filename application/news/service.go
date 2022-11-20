@@ -10,6 +10,7 @@ type (
 		Create(data *dto.News) error
 		GetAll(data *dto.NewsSlice) error
 		GetById(id string, data *dto.News) error
+		Delete(id string) error
 	}
 	service struct {
 		shared shared.Holder
@@ -28,6 +29,11 @@ func (s *service) GetAll(data *dto.NewsSlice) error {
 
 func (s *service) GetById(id string, data *dto.News) error {
 	err := s.shared.DB.Where("id = ?", id).First(data).Error
+	return err
+}
+
+func (s *service) Delete(id string) error {
+	err := s.shared.DB.Delete(&dto.News{}, id).Error
 	return err
 }
 

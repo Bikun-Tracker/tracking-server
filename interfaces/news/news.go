@@ -12,6 +12,7 @@ type (
 		CreateNews(data dto.CreateNewsDto) (dto.CreateNewsResponse, error)
 		GetAllNews() (dto.GetAllNewsResponse, error)
 		GetNewsDetail(id string) (dto.News, error)
+		DeleteNews(id string) error
 	}
 	viewService struct {
 		application application.Holder
@@ -71,6 +72,15 @@ func (v *viewService) GetNewsDetail(id string) (dto.News, error) {
 	}
 
 	return *news, nil
+}
+
+func (v *viewService) DeleteNews(id string) error {
+	err := v.application.NewsService.Delete(id)
+	if err != nil {
+		v.shared.Logger.Errorf("error when deleting news, err: %s", err.Error())
+		return err
+	}
+	return nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

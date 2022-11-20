@@ -301,6 +301,22 @@ paths:
       tags:
       - News
   /news/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: News ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete News
+      tags:
+      - News
     get:
       consumes:
       - application/json
@@ -318,7 +334,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.News'
-      summary: Get bus detail
+      summary: Get news detail
       tags:
       - News
 swagger: "2.0"

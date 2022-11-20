@@ -248,7 +248,7 @@ const docTemplate = `{
                 "tags": [
                     "News"
                 ],
-                "summary": "Get bus detail",
+                "summary": "Get news detail",
                 "parameters": [
                     {
                         "type": "string",
@@ -266,6 +266,29 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "News"
+                ],
+                "summary": "Delete News",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "News ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
             }
         }
     },

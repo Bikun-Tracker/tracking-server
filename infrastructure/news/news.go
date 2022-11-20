@@ -19,6 +19,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	news.Post("/", c.create)
 	news.Get("/", c.getAll)
 	news.Get("/:id", c.get)
+	news.Delete("/:id", c.delete)
 }
 
 // All godoc
@@ -76,7 +77,7 @@ func (c *Controller) getAll(ctx *fiber.Ctx) error {
 
 // All godoc
 // @Tags News
-// @Summary Get bus detail
+// @Summary Get news detail
 // @Description Put all mandatory parameter
 // @Param id path string true "News ID"
 // @Accept  json
@@ -96,6 +97,29 @@ func (c *Controller) get(ctx *fiber.Ctx) error {
 
 	return common.DoCommonSuccessResponse(ctx, res)
 }
+
+// All godoc
+// @Tags News
+// @Summary Delete News
+// @Description Put all mandatory parameter
+// @Param id path string true "News ID"
+// @Accept  json
+// @Produce  json
+// @Router /news/{id} [delete]
+func (c *Controller) delete(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	c.Shared.Logger.Infof("delete news, data: %s", id)
+
+	err := c.Interfaces.NewsViewService.DeleteNews(id)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, nil)
+}
+
+// TODO: Update
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {
 	return Controller{

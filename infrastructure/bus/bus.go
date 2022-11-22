@@ -22,6 +22,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	bus.Post("/login", c.login)
 	bus.Delete("/:id", c.delete)
 	bus.Put("/:id", c.edit)
+	bus.Post("/info/:id", c.busInfo)
 
 	bus.Use("/stream", func(ctx *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(ctx) {
@@ -147,6 +148,33 @@ func (c *Controller) edit(ctx *fiber.Ctx) error {
 	c.Shared.Logger.Infof("edit driver, data: %s, id: %s, token: %s", body, id, auth)
 
 	response, err = c.Interfaces.BusViewService.EditBus(body, id, auth)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
+}
+
+// All godoc
+// @Tags Bus
+// @Summary Get bus estimation
+// @Description Put all mandatory parameter
+// @Param id path string true "Terminal ID"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.BusInfoResponse
+// @Failure 200 {object} dto.BusInfoResponse
+// @Router /bus/info/{id} [post]
+func (c *Controller) busInfo(ctx *fiber.Ctx) error {
+	var (
+		response dto.BusInfoResponse
+	)
+
+	id := ctx.Params("id")
+
+	c.Shared.Logger.Infof("bus info, data: %s", id)
+
+	response, err := c.Interfaces.BusViewService.BusInfo(id)
 	if err != nil {
 		return common.DoCommonErrorResponse(ctx, err)
 	}

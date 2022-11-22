@@ -1,6 +1,7 @@
 package bus
 
 import (
+	"sort"
 	"time"
 	"tracking-server/application"
 	"tracking-server/shared"
@@ -19,6 +20,7 @@ type (
 		EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error)
 		TrackBusLocation(token string, c *websocket.Conn) error
 		StreamBusLocation() []dto.TrackLocationResponse
+		BusInfo(id string) (dto.BusInfoResponse, error)
 	}
 	viewService struct {
 		application application.Holder
@@ -217,6 +219,44 @@ func (v *viewService) StreamBusLocation() []dto.TrackLocationResponse {
 	}
 
 	return response
+}
+
+func (v *viewService) BusInfo(id string) (dto.BusInfoResponse, error) {
+	var (
+		res               dto.BusInfoResponse
+		terminal          = dto.Terminal{}
+		busLatestLocation []dto.TrackLocationResponse
+		busInfo           = make([]dto.BusInfo, 0)
+	)
+
+	err := v.application.TerminalService.GetById(id, &terminal)
+	if err != nil {
+		v.shared.Logger.Errorf("error when finding all terminal by id, err: %s", err.Error())
+		return res, err
+	}
+
+	busLatestLocation = v.StreamBusLocation()
+
+	for _, b := range busLatestLocation {
+		distance := common.Distance(b.Lat, b.Long, terminal.Lat, terminal.Long)
+		estimate := int(distance/b.Speed) * 3600
+		busInfo = append(busInfo, dto.BusInfo{
+			ID:       b.ID,
+			Number:   b.Number,
+			Plate:    b.Plate,
+			Status:   b.Status,
+			Route:    b.Route,
+			Estimate: estimate,
+		})
+	}
+
+	sort.Slice(busInfo, func(i, j int) bool {
+		return busInfo[i].Estimate < busInfo[j].Estimate
+	})
+
+	res.Bus = busInfo
+
+	return res, nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

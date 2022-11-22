@@ -115,6 +115,19 @@ type (
 		Speed    float64   `json:"speed"`
 		Heading  float64   `json:"heading"`
 	}
+	BusInfo struct {
+		ID       uint      `json:"id"`
+		Number   int       `json:"number"`
+		Plate    string    `json:"plate"`
+		Status   BusStatus `json:"status"`
+		Route    Route     `json:"route"`
+		Estimate int       `json:"estimate"`
+	}
+
+	// BusInfoResponse BusInfoResponse
+	BusInfoResponse struct {
+		Bus []BusInfo `json:"bus"`
+	}
 )
 
 func (b *Bus) ToCreateBusResponse() CreateBusResponse {

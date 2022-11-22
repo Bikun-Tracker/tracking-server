@@ -364,6 +364,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/terminal/twoClosest": {
+            "post": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terminal"
+                ],
+                "summary": "Get two closestterminal",
+                "parameters": [
+                    {
+                        "description": "GetAllTerminalDto",
+                        "name": "GetAllTerminalDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllTerminalDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllTerminalResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/terminal/{id}": {
             "get": {
                 "description": "Put all mandatory parameter",

@@ -467,4 +467,26 @@ paths:
       summary: Get all terminal sorted by distance
       tags:
       - Terminal
+  /terminal/twoClosest:
+    post:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: GetAllTerminalDto
+        in: body
+        name: GetAllTerminalDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetAllTerminalDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetAllTerminalResponse'
+      summary: Get two closestterminal
+      tags:
+      - Terminal
 swagger: "2.0"

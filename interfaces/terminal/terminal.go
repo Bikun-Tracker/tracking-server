@@ -12,6 +12,7 @@ type (
 	ViewService interface {
 		GetTerminalInfo(id string) (dto.GetTerminalInfoResponse, error)
 		GetAllTerminalSorted(data dto.GetAllTerminalDto) (dto.GetAllTerminalResponse, error)
+		GetTwoClosesTerminal(data dto.GetAllTerminalDto) (dto.GetAllTerminalResponse, error)
 	}
 	viewService struct {
 		application application.Holder
@@ -76,6 +77,17 @@ func (v *viewService) GetAllTerminalSorted(data dto.GetAllTerminalDto) (dto.GetA
 	}
 
 	return res, nil
+}
+
+func (v *viewService) GetTwoClosesTerminal(data dto.GetAllTerminalDto) (dto.GetAllTerminalResponse, error) {
+	resp, err := v.GetAllTerminalSorted(data)
+	if err != nil {
+		return resp, err
+	}
+
+	resp.Terminals = resp.Terminals[0:2]
+
+	return resp, nil
 }
 
 func (v *viewService) getTerminalDistance(data dto.GetAllTerminalDto, terminal dto.Terminal, next string) dto.TerminalListWithDistance {

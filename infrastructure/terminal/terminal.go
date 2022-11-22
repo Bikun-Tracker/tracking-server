@@ -18,6 +18,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	terminal := app.Group("/terminal")
 	terminal.Get("/:id", c.get)
 	terminal.Post("/allTerminal", c.allTerminal)
+	terminal.Post("/twoClosest", c.twoClosestTerminal)
 }
 
 // All godoc
@@ -67,6 +68,37 @@ func (c *Controller) allTerminal(ctx *fiber.Ctx) error {
 	c.Shared.Logger.Infof("get all terminal, data: %s", body)
 
 	response, err = c.Interfaces.TerminalViewsService.GetAllTerminalSorted(body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
+}
+
+// All godoc
+// @Tags Terminal
+// @Summary Get two closestterminal
+// @Description Put all mandatory parameter
+// @Param GetAllTerminalDto body dto.GetAllTerminalDto true "GetAllTerminalDto"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.GetAllTerminalResponse
+// @Failure 200 {object} dto.GetAllTerminalResponse
+// @Router /terminal/twoClosest [post]
+func (c *Controller) twoClosestTerminal(ctx *fiber.Ctx) error {
+	var (
+		body     dto.GetAllTerminalDto
+		response dto.GetAllTerminalResponse
+	)
+
+	err := common.DoCommonRequest(ctx, &body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	c.Shared.Logger.Infof("get all terminal, data: %s", body)
+
+	response, err = c.Interfaces.TerminalViewsService.GetTwoClosesTerminal(body)
 	if err != nil {
 		return common.DoCommonErrorResponse(ctx, err)
 	}

@@ -11,6 +11,8 @@ import (
 	"github.com/gofiber/websocket/v2"
 )
 
+var users = make([]*dto.Connection, 0)
+
 type Controller struct {
 	Interfaces interfaces.Holder
 	Shared     shared.Holder
@@ -30,9 +32,7 @@ func (c *Controller) Routes(app *fiber.App) {
 		}
 		return fiber.ErrUpgradeRequired
 	})
-	bus.Get("/stream/driver/:auth", websocket.New(c.trackBusLocation))
-
-	bus.Get("/stream/user", websocket.New(c.streamBusLocation))
+	bus.Get("/stream", websocket.New(c.trackBusLocation))
 }
 
 // All godoc
@@ -184,38 +184,67 @@ func (c *Controller) busInfo(ctx *fiber.Ctx) error {
 
 func (c *Controller) trackBusLocation(ctx *websocket.Conn) {
 	defer func() {
-		ctx.Close()
-	}()
-	auth := ctx.Params("auth")
-	for {
-		if err := c.Interfaces.BusViewService.TrackBusLocation(auth, ctx); err != nil {
-			return
+		for i := 0; i < len(users); i++ {
+			if users[i].Socket == ctx {
+				users[i].Socket.Close()
+				users = append(users[:i], users[i+1:]...)
+			}
 		}
+	}()
+
+	query := dto.BusLocationQuery{
+		Type:  ctx.Query("type", string(dto.CLIENT)),
+		Token: ctx.Query("token", ""),
 	}
-}
 
-func (c *Controller) streamBusLocation(ctx *websocket.Conn) {
-	var (
-		msg []byte
-		err error
-	)
-	defer func() {
-		ctx.Close()
-	}()
+	c.Shared.Logger.Infof("stream bus location, query: %s", query)
+
+	if query.Type == string(dto.CLIENT) {
+		users = append(users, &dto.Connection{
+			Socket: ctx,
+		})
+	}
+
+	c.Shared.Logger.Infof("current user pool: %d", len(users))
 
 	for {
-		if _, msg, err = ctx.ReadMessage(); err != nil {
-			return
-		}
-
-		if string(msg) == "TRACK" {
-			data := c.Interfaces.BusViewService.StreamBusLocation()
-			if err = ctx.WriteJSON(data); err != nil {
+		if query.Type == string(dto.DRIVER) {
+			data, err := c.Interfaces.BusViewService.TrackBusLocation(query, ctx)
+			if err != nil {
 				return
+			}
+			ctx.WriteJSON(data)
+		} else {
+			busLocation := c.Interfaces.BusViewService.StreamBusLocation()
+			for _, u := range users {
+				u.Send(busLocation)
 			}
 		}
 	}
 }
+
+// func (c *Controller) streamBusLocation(ctx *websocket.Conn) {
+// 	var (
+// 		msg []byte
+// 		err error
+// 	)
+// 	defer func() {
+// 		ctx.Close()
+// 	}()
+
+// 	for {
+// 		if _, msg, err = ctx.ReadMessage(); err != nil {
+// 			return
+// 		}
+
+// 		if string(msg) == "TRACK" {
+// 			data := c.Interfaces.BusViewService.StreamBusLocation()
+// 			if err = ctx.WriteJSON(data); err != nil {
+// 				return
+// 			}
+// 		}
+// 	}
+// }
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {
 	return Controller{

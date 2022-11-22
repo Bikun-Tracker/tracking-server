@@ -18,7 +18,7 @@ type (
 		LoginDriver(data dto.DriverLoginDto) (dto.DriverLoginResponse, error)
 		DeleteBus(id string) error
 		EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error)
-		TrackBusLocation(token string, c *websocket.Conn) error
+		TrackBusLocation(query dto.BusLocationQuery, c *websocket.Conn) (dto.BusLocationMessage, error)
 		StreamBusLocation() []dto.TrackLocationResponse
 		BusInfo(id string) (dto.BusInfoResponse, error)
 	}
@@ -139,26 +139,26 @@ func (v *viewService) EditBus(data dto.EditBusDto, id string, token string) (dto
 	return response, nil
 }
 
-func (v *viewService) TrackBusLocation(token string, c *websocket.Conn) error {
+func (v *viewService) TrackBusLocation(query dto.BusLocationQuery, c *websocket.Conn) (dto.BusLocationMessage, error) {
 	var (
 		data = dto.BusLocationMessage{}
 		bus  = dto.Bus{}
 	)
 
-	username, err := common.ExtractTokenData(token, v.shared.Env)
+	username, err := common.ExtractTokenData(query.Token, v.shared.Env)
 	if err != nil {
 		v.shared.Logger.Errorf("error when parsing jwt, err: %s", err.Error())
-		return err
+		return data, err
 	}
 
 	err = v.application.BusService.FindByUsername(username, &bus)
 	if err != nil {
-		return err
+		return data, err
 	}
 
 	if err := c.ReadJSON(&data); err != nil {
 		v.shared.Logger.Errorf("error when receiving websocket message, err: %s", err.Error())
-		return err
+		return data, err
 	}
 
 	location := dto.BusLocation{
@@ -177,10 +177,10 @@ func (v *viewService) TrackBusLocation(token string, c *websocket.Conn) error {
 
 	if err := c.WriteJSON(data); err != nil {
 		v.shared.Logger.Errorf("error when writing message, err: %s", err.Error())
-		return err
+		return data, err
 	}
 
-	return nil
+	return data, nil
 }
 
 func (v *viewService) StreamBusLocation() []dto.TrackLocationResponse {

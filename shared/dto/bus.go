@@ -1,6 +1,11 @@
 package dto
 
-import "time"
+import (
+	"sync"
+	"time"
+
+	"github.com/gofiber/websocket/v2"
+)
 
 const (
 	// Crowded Status
@@ -11,12 +16,17 @@ const (
 	// Route
 	RED  Route = "RED"
 	BLUE Route = "BLUE"
+
+	CLIENT WSType = "client"
+	DRIVER WSType = "driver"
 )
 
 type (
 	BusStatus string
 
 	Route string
+
+	WSType string
 
 	Bus struct {
 		ID       uint          `gorm:"primaryKey;autoIncrement"`
@@ -96,6 +106,11 @@ type (
 		IsActive bool      `json:"isActive"`
 	}
 
+	BusLocationQuery struct {
+		Type  string
+		Token string
+	}
+
 	BusLocationMessage struct {
 		Long    float64 `json:"long"`
 		Lat     float64 `json:"lat"`
@@ -128,7 +143,18 @@ type (
 	BusInfoResponse struct {
 		Bus []BusInfo `json:"bus"`
 	}
+
+	Connection struct {
+		Socket *websocket.Conn
+		Mu     sync.Mutex
+	}
 )
+
+func (c *Connection) Send(data []TrackLocationResponse) error {
+	c.Mu.Lock()
+	defer c.Mu.Unlock()
+	return c.Socket.WriteJSON(data)
+}
 
 func (b *Bus) ToCreateBusResponse() CreateBusResponse {
 	return CreateBusResponse{

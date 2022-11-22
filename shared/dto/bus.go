@@ -33,9 +33,11 @@ type (
 	BusLocation struct {
 		ID        uint      `gorm:"primaryKey;autoIncrement"`
 		BusID     uint      `gorm:"column:bus_id"`
-		Long      float64   `gorm:"longitude"`
-		Lat       float64   `gorm:"latitude"`
+		Long      float64   `gorm:"column:longitude"`
+		Lat       float64   `gorm:"column:latitude"`
 		Timestamp time.Time `gorm:"column:timestamp"`
+		Speed     float64   `gorm:"column:speed"`
+		Heading   float64   `gorm:"column:heading"`
 	}
 
 	// CreateBusDto CreateBusDto
@@ -95,8 +97,23 @@ type (
 	}
 
 	BusLocationMessage struct {
-		Long float64 `json:"long"`
-		Lat  float64 `json:"lat"`
+		Long    float64 `json:"long"`
+		Lat     float64 `json:"lat"`
+		Speed   float64 `json:"speed"`
+		Heading float64 `json:"heading"`
+	}
+
+	TrackLocationResponse struct {
+		ID       uint      `json:"id"`
+		Number   int       `json:"number"`
+		Plate    string    `json:"plate"`
+		Status   BusStatus `json:"status"`
+		Route    Route     `json:"route"`
+		IsActive bool      `json:"isActive"`
+		Long     float64   `json:"long"`
+		Lat      float64   `json:"lat"`
+		Speed    float64   `json:"speed"`
+		Heading  float64   `json:"heading"`
 	}
 )
 

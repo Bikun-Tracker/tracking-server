@@ -18,6 +18,7 @@ type (
 		DeleteBus(id string) error
 		EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error)
 		TrackBusLocation(token string, c *websocket.Conn) error
+		StreamBusLocation() []dto.TrackLocationResponse
 	}
 	viewService struct {
 		application application.Holder
@@ -138,34 +139,34 @@ func (v *viewService) EditBus(data dto.EditBusDto, id string, token string) (dto
 
 func (v *viewService) TrackBusLocation(token string, c *websocket.Conn) error {
 	var (
-		data     = dto.BusLocationMessage{}
-		bus      = dto.Bus{}
-		location = dto.BusLocation{}
+		data = dto.BusLocationMessage{}
+		bus  = dto.Bus{}
 	)
 
 	username, err := common.ExtractTokenData(token, v.shared.Env)
 	if err != nil {
 		v.shared.Logger.Errorf("error when parsing jwt, err: %s", err.Error())
-		c.Close()
 		return err
 	}
 
 	err = v.application.BusService.FindByUsername(username, &bus)
 	if err != nil {
-		c.Close()
 		return err
 	}
 
 	if err := c.ReadJSON(&data); err != nil {
 		v.shared.Logger.Errorf("error when receiving websocket message, err: %s", err.Error())
-		c.Close()
 		return err
 	}
 
-	location.BusID = bus.ID
-	location.Lat = data.Lat
-	location.Long = data.Long
-	location.Timestamp = time.Now()
+	location := dto.BusLocation{
+		BusID:     bus.ID,
+		Lat:       data.Lat,
+		Long:      data.Long,
+		Timestamp: time.Now(),
+		Speed:     data.Speed,
+		Heading:   data.Heading,
+	}
 
 	go func() {
 		v.application.BusService.InsertBusLocation(&location)
@@ -174,11 +175,48 @@ func (v *viewService) TrackBusLocation(token string, c *websocket.Conn) error {
 
 	if err := c.WriteJSON(data); err != nil {
 		v.shared.Logger.Errorf("error when writing message, err: %s", err.Error())
-		c.Close()
 		return err
 	}
 
 	return nil
+}
+
+func (v *viewService) StreamBusLocation() []dto.TrackLocationResponse {
+	var (
+		bus      = []dto.Bus{}
+		response = make([]dto.TrackLocationResponse, 0)
+	)
+
+	err := v.application.BusService.FindAllBus(&bus)
+	if err != nil {
+		v.shared.Logger.Errorf("error when finding all bus, err: %s", err.Error())
+		return response
+	}
+
+	for _, d := range bus {
+		parsedData := dto.TrackLocationResponse{
+			ID:       d.ID,
+			Number:   d.Number,
+			Status:   d.Status,
+			Route:    d.Route,
+			Plate:    d.Plate,
+			IsActive: d.IsActive,
+		}
+		location := dto.BusLocation{}
+		err = v.application.BusService.FindBusLatestLocation(d.ID, &location)
+		if err != nil {
+			v.shared.Logger.Errorf("error when finding bus latest location, err: %s", err.Error())
+			continue
+		}
+		parsedData.Lat = location.Lat
+		parsedData.Long = location.Long
+		parsedData.Speed = location.Speed
+		parsedData.Heading = location.Heading
+
+		response = append(response, parsedData)
+	}
+
+	return response
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

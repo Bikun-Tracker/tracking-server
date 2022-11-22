@@ -22,7 +22,16 @@ func (c *Controller) Routes(app *fiber.App) {
 	bus.Post("/login", c.login)
 	bus.Delete("/:id", c.delete)
 	bus.Put("/:id", c.edit)
-	bus.Get("/stream/:auth", websocket.New(c.trackBusLocation))
+
+	bus.Use("/stream", func(ctx *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(ctx) {
+			return ctx.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+	bus.Get("/stream/driver/:auth", websocket.New(c.trackBusLocation))
+
+	bus.Get("/stream/user", websocket.New(c.streamBusLocation))
 }
 
 // All godoc
@@ -146,10 +155,36 @@ func (c *Controller) edit(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) trackBusLocation(ctx *websocket.Conn) {
+	defer func() {
+		ctx.Close()
+	}()
 	auth := ctx.Params("auth")
 	for {
 		if err := c.Interfaces.BusViewService.TrackBusLocation(auth, ctx); err != nil {
 			return
+		}
+	}
+}
+
+func (c *Controller) streamBusLocation(ctx *websocket.Conn) {
+	var (
+		msg []byte
+		err error
+	)
+	defer func() {
+		ctx.Close()
+	}()
+
+	for {
+		if _, msg, err = ctx.ReadMessage(); err != nil {
+			return
+		}
+
+		if string(msg) == "TRACK" {
+			data := c.Interfaces.BusViewService.StreamBusLocation()
+			if err = ctx.WriteJSON(data); err != nil {
+				return
+			}
 		}
 	}
 }

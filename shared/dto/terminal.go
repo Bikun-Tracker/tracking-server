@@ -1,5 +1,7 @@
 package dto
 
+import "strings"
+
 type (
 	Terminal struct {
 		ID          uint    `gorm:"primaryKey;autoIncrement"`
@@ -9,7 +11,51 @@ type (
 		Longitude   float64 `gorm:"longitude"`
 		Latitude    float64 `gorm:"latitude"`
 	}
+
+	VisitedTerminal struct {
+		ID   uint   `json:"id"`
+		Name string `json:"name"`
+		Past bool   `json:"past"`
+	}
+
+	// GetTerminalInfoResponse GetTerminalInfoResponse
+	GetTerminalInfoResponse struct {
+		Name            string            `json:"name"`
+		Route           Route             `json:"route"`
+		RelatedPlace    []string          `json:"relatedPlace"`
+		RelatedTerminal []VisitedTerminal `json:"relatedTerminal"`
+	}
 )
+
+func (t *Terminal) ToTerminalInfo(terminal []Terminal) GetTerminalInfoResponse {
+	var (
+		res                      = GetTerminalInfoResponse{}
+		visitedTerminal          = make([]VisitedTerminal, 0)
+		isCurrentTerminalVisited = true
+	)
+
+	res.Name = t.Name
+	res.RelatedPlace = strings.Split(t.PlaceAround, ",")
+	res.Route = t.Route
+
+	for _, v := range terminal {
+		vt := VisitedTerminal{
+			ID:   v.ID,
+			Name: v.Name,
+			Past: isCurrentTerminalVisited,
+		}
+
+		visitedTerminal = append(visitedTerminal, vt)
+
+		if v.ID == t.ID {
+			isCurrentTerminalVisited = false
+		}
+	}
+
+	res.RelatedTerminal = visitedTerminal
+
+	return res
+}
 
 func (t *Terminal) Seeder() []Terminal {
 	return []Terminal{

@@ -329,6 +329,38 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/terminal/{id}": {
+            "get": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terminal"
+                ],
+                "summary": "Get terminal info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "terminal ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetTerminalInfoResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -536,6 +568,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GetTerminalInfoResponse": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "relatedPlace": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "relatedTerminal": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VisitedTerminal"
+                    }
+                },
+                "route": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.News": {
             "type": "object",
             "properties": {
@@ -562,6 +617,20 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.VisitedTerminal": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "past": {
+                    "type": "boolean"
                 }
             }
         }

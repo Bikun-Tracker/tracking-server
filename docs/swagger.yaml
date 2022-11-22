@@ -136,6 +136,21 @@ definitions:
           $ref: '#/definitions/dto.News'
         type: array
     type: object
+  dto.GetTerminalInfoResponse:
+    properties:
+      name:
+        type: string
+      relatedPlace:
+        items:
+          type: string
+        type: array
+      relatedTerminal:
+        items:
+          $ref: '#/definitions/dto.VisitedTerminal'
+        type: array
+      route:
+        type: string
+    type: object
   dto.News:
     properties:
       createdAt:
@@ -154,6 +169,15 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  dto.VisitedTerminal:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      past:
+        type: boolean
     type: object
 host: localhost:8000
 info:
@@ -370,4 +394,25 @@ paths:
       summary: Edit news
       tags:
       - News
+  /terminal/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: terminal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetTerminalInfoResponse'
+      summary: Get terminal info
+      tags:
+      - Terminal
 swagger: "2.0"

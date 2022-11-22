@@ -1,11 +1,13 @@
 package bus
 
 import (
+	"time"
 	"tracking-server/application"
 	"tracking-server/shared"
 	"tracking-server/shared/common"
 	"tracking-server/shared/dto"
 
+	"github.com/gofiber/websocket/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,6 +17,7 @@ type (
 		LoginDriver(data dto.DriverLoginDto) (dto.DriverLoginResponse, error)
 		DeleteBus(id string) error
 		EditBus(data dto.EditBusDto, id string, token string) (dto.EditBusResponse, error)
+		TrackBusLocation(token string, c *websocket.Conn) error
 	}
 	viewService struct {
 		application application.Holder
@@ -103,8 +106,12 @@ func (v *viewService) EditBus(data dto.EditBusDto, id string, token string) (dto
 		response dto.EditBusResponse
 	)
 
-	username := common.ExtractTokenData(token, v.shared.Env)
-	err := v.application.BusService.FindByUsername(username, bus)
+	username, err := common.ExtractTokenData(token, v.shared.Env)
+	if err != nil {
+		v.shared.Logger.Errorf("error when extract jwt, err: %s", err.Error())
+	}
+
+	err = v.application.BusService.FindByUsername(username, bus)
 	if err != nil {
 		v.shared.Logger.Errorf("error when checking username, err: %s", err.Error())
 		return response, err
@@ -127,6 +134,51 @@ func (v *viewService) EditBus(data dto.EditBusDto, id string, token string) (dto
 	response = bus.ToEditBusResponnse()
 
 	return response, nil
+}
+
+func (v *viewService) TrackBusLocation(token string, c *websocket.Conn) error {
+	var (
+		data     = dto.BusLocationMessage{}
+		bus      = dto.Bus{}
+		location = dto.BusLocation{}
+	)
+
+	username, err := common.ExtractTokenData(token, v.shared.Env)
+	if err != nil {
+		v.shared.Logger.Errorf("error when parsing jwt, err: %s", err.Error())
+		c.Close()
+		return err
+	}
+
+	err = v.application.BusService.FindByUsername(username, &bus)
+	if err != nil {
+		c.Close()
+		return err
+	}
+
+	if err := c.ReadJSON(&data); err != nil {
+		v.shared.Logger.Errorf("error when receiving websocket message, err: %s", err.Error())
+		c.Close()
+		return err
+	}
+
+	location.BusID = bus.ID
+	location.Lat = data.Lat
+	location.Long = data.Long
+	location.Timestamp = time.Now()
+
+	go func() {
+		v.application.BusService.InsertBusLocation(&location)
+		v.shared.Logger.Infof("insert bus location, data: %s", location)
+	}()
+
+	if err := c.WriteJSON(data); err != nil {
+		v.shared.Logger.Errorf("error when writing message, err: %s", err.Error())
+		c.Close()
+		return err
+	}
+
+	return nil
 }
 
 func NewViewService(application application.Holder, shared shared.Holder) ViewService {

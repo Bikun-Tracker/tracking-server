@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 const (
 	// Crowded Status
 	EMPTY    BusStatus = "EMPTY"
@@ -17,14 +19,23 @@ type (
 	Route string
 
 	Bus struct {
-		ID       uint      `gorm:"primaryKey;autoIncrement"`
-		Number   int       `gorm:"column:number;unique"`
-		Plate    string    `gorm:"column:plate;unique"`
-		Status   BusStatus `gorm:"column:status;default:EMPTY"`
-		Route    Route     `gorm:"column:route"`
-		IsActive bool      `gorm:"column:is_active;default:false"`
-		Username string    `gorm:"column:username;unique"`
-		Password string    `gorm:"password"`
+		ID       uint          `gorm:"primaryKey;autoIncrement"`
+		Number   int           `gorm:"column:number;unique"`
+		Plate    string        `gorm:"column:plate;unique"`
+		Status   BusStatus     `gorm:"column:status;default:EMPTY"`
+		Route    Route         `gorm:"column:route"`
+		IsActive bool          `gorm:"column:is_active;default:false"`
+		Username string        `gorm:"column:username;unique"`
+		Password string        `gorm:"password"`
+		Location []BusLocation `gorm:"foreignKey:bus_id"`
+	}
+
+	BusLocation struct {
+		ID        uint      `gorm:"primaryKey;autoIncrement"`
+		BusID     uint      `gorm:"column:bus_id"`
+		Long      float64   `gorm:"longitude"`
+		Lat       float64   `gorm:"latitude"`
+		Timestamp time.Time `gorm:"column:timestamp"`
 	}
 
 	// CreateBusDto CreateBusDto
@@ -81,6 +92,11 @@ type (
 		Status   BusStatus `json:"status"`
 		Route    Route     `json:"route"`
 		IsActive bool      `json:"isActive"`
+	}
+
+	BusLocationMessage struct {
+		Long float64 `json:"long"`
+		Lat  float64 `json:"lat"`
 	}
 )
 

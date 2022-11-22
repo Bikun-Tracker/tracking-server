@@ -12,6 +12,7 @@ type (
 		Delete(id string) error
 		Save(data *dto.Bus) error
 		FindById(id string, bus *dto.Bus) error
+		InsertBusLocation(location *dto.BusLocation) error
 	}
 	service struct {
 		shared shared.Holder
@@ -40,6 +41,11 @@ func (s *service) Save(data *dto.Bus) error {
 
 func (s *service) FindById(id string, bus *dto.Bus) error {
 	err := s.shared.DB.Where("id = ?", id).First(bus).Error
+	return err
+}
+
+func (s *service) InsertBusLocation(location *dto.BusLocation) error {
+	err := s.shared.DB.Create(location).Error
 	return err
 }
 

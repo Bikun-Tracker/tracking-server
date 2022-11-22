@@ -8,6 +8,7 @@ import (
 	"tracking-server/shared/common"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 )
 
 type Controller struct {
@@ -21,6 +22,7 @@ func (c *Controller) Routes(app *fiber.App) {
 	bus.Post("/login", c.login)
 	bus.Delete("/:id", c.delete)
 	bus.Put("/:id", c.edit)
+	bus.Get("/stream/:auth", websocket.New(c.trackBusLocation))
 }
 
 // All godoc
@@ -141,6 +143,15 @@ func (c *Controller) edit(ctx *fiber.Ctx) error {
 	}
 
 	return common.DoCommonSuccessResponse(ctx, response)
+}
+
+func (c *Controller) trackBusLocation(ctx *websocket.Conn) {
+	auth := ctx.Params("auth")
+	for {
+		if err := c.Interfaces.BusViewService.TrackBusLocation(auth, ctx); err != nil {
+			return
+		}
+	}
 }
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {

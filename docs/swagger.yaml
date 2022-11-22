@@ -136,6 +136,23 @@ definitions:
           $ref: '#/definitions/dto.News'
         type: array
     type: object
+  dto.GetAllTerminalDto:
+    properties:
+      lat:
+        type: number
+      long:
+        type: number
+    required:
+    - lat
+    - long
+    type: object
+  dto.GetAllTerminalResponse:
+    properties:
+      terminal:
+        items:
+          $ref: '#/definitions/dto.TerminalListWithDistance'
+        type: array
+    type: object
   dto.GetTerminalInfoResponse:
     properties:
       name:
@@ -168,6 +185,19 @@ definitions:
       name:
         type: string
       status:
+        type: string
+    type: object
+  dto.TerminalListWithDistance:
+    properties:
+      distance:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      next:
+        type: string
+      route:
         type: string
     type: object
   dto.VisitedTerminal:
@@ -413,6 +443,28 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetTerminalInfoResponse'
       summary: Get terminal info
+      tags:
+      - Terminal
+  /terminal/allTerminal:
+    post:
+      consumes:
+      - application/json
+      description: Put all mandatory parameter
+      parameters:
+      - description: GetAllTerminalDto
+        in: body
+        name: GetAllTerminalDto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetAllTerminalDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GetAllTerminalResponse'
+      summary: Get all terminal sorted by distance
       tags:
       - Terminal
 swagger: "2.0"

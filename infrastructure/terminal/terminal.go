@@ -4,6 +4,7 @@ import (
 	"tracking-server/interfaces"
 	"tracking-server/shared"
 	"tracking-server/shared/common"
+	"tracking-server/shared/dto"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -14,8 +15,9 @@ type Controller struct {
 }
 
 func (c *Controller) Routes(app *fiber.App) {
-	news := app.Group("/terminal")
-	news.Get("/:id", c.get)
+	terminal := app.Group("/terminal")
+	terminal.Get("/:id", c.get)
+	terminal.Post("/allTerminal", c.allTerminal)
 }
 
 // All godoc
@@ -39,6 +41,37 @@ func (c *Controller) get(ctx *fiber.Ctx) error {
 	}
 
 	return common.DoCommonSuccessResponse(ctx, res)
+}
+
+// All godoc
+// @Tags Terminal
+// @Summary Get all terminal sorted by distance
+// @Description Put all mandatory parameter
+// @Param GetAllTerminalDto body dto.GetAllTerminalDto true "GetAllTerminalDto"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.GetAllTerminalResponse
+// @Failure 200 {object} dto.GetAllTerminalResponse
+// @Router /terminal/allTerminal [post]
+func (c *Controller) allTerminal(ctx *fiber.Ctx) error {
+	var (
+		body     dto.GetAllTerminalDto
+		response dto.GetAllTerminalResponse
+	)
+
+	err := common.DoCommonRequest(ctx, &body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	c.Shared.Logger.Infof("get all terminal, data: %s", body)
+
+	response, err = c.Interfaces.TerminalViewsService.GetAllTerminalSorted(body)
+	if err != nil {
+		return common.DoCommonErrorResponse(ctx, err)
+	}
+
+	return common.DoCommonSuccessResponse(ctx, response)
 }
 
 func NewController(interfaces interfaces.Holder, shared shared.Holder) Controller {

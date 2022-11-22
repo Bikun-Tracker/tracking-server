@@ -330,6 +330,40 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/terminal/allTerminal": {
+            "post": {
+                "description": "Put all mandatory parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terminal"
+                ],
+                "summary": "Get all terminal sorted by distance",
+                "parameters": [
+                    {
+                        "description": "GetAllTerminalDto",
+                        "name": "GetAllTerminalDto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllTerminalDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllTerminalResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/terminal/{id}": {
             "get": {
                 "description": "Put all mandatory parameter",
@@ -568,6 +602,32 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GetAllTerminalDto": {
+            "type": "object",
+            "required": [
+                "lat",
+                "long"
+            ],
+            "properties": {
+                "lat": {
+                    "type": "number"
+                },
+                "long": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.GetAllTerminalResponse": {
+            "type": "object",
+            "properties": {
+                "terminal": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TerminalListWithDistance"
+                    }
+                }
+            }
+        },
         "dto.GetTerminalInfoResponse": {
             "type": "object",
             "properties": {
@@ -616,6 +676,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TerminalListWithDistance": {
+            "type": "object",
+            "properties": {
+                "distance": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "next": {
+                    "type": "string"
+                },
+                "route": {
                     "type": "string"
                 }
             }
